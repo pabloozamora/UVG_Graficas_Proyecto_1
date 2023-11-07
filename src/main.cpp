@@ -18,13 +18,11 @@ Color currentColor;
 
 const std::string modelPath = "../models/sphere.obj";
 Color clearColor(0, 0, 0);  // Color del fondo
-float rotationAngle = glm::radians(0.0f);
 
 std::vector<glm::vec3> vertices;
 std::vector<glm::vec3> normals;
 std::vector<Face> faces;
 std::vector<Vertex> verticesArray;
-std::vector<Planet> models;
 std::vector<std::vector<Vertex>> modelsVertices;
 
 Uniforms uniforms;
@@ -151,30 +149,27 @@ void render(Primitive polygon, std::string name){
 
 }
 
-std::string getCurrentPlanet(int& planetIndex) {
-    // Definir orden de los planetas
-    if (planetIndex == 0) {
-        return "sun";
+void setUpRender(Planet& model) {
+    float rotationAngle = model.rotationAngle;
+    float translationAngle = model.translationAngle;
+
+    glm::vec3 rotationAxis(0.0f, 1.0f, 0.0f);
+    
+    if (model.name != "sun") {
+        model.rotationAngle += 1;
+        model.translationAngle += model.translationSpeed;
     }
+    glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(rotationAngle), rotationAxis);
 
-    else if (planetIndex == 1) {
-        return "earth";
-    }
+    glm::mat4 scale = glm::scale(glm::mat4(1.0f), model.scaleFactor);
 
-    else if (planetIndex == 2) {
-        return "gas";
-    }
+    model.worldPos.x = model.translationAxis.x + (model.translationRadius * cos(glm::radians(translationAngle)));
+    model.worldPos.z = model.translationAxis.z + (model.translationRadius * sin(glm::radians(translationAngle)));
 
-    else if (planetIndex == 3) {
-        return "diamond";
-    }
+    glm::mat4 translation = glm::translate(glm::mat4(1.0f), model.worldPos);
 
-    else if (planetIndex == 4) {
-        return "slime";
-    }
-
-     return "sun";
-
+    // Calcular la matriz de modelo
+    uniforms.model = translation * rotation * scale;
 }
 
 int main(int argv, char** args)
@@ -185,11 +180,11 @@ int main(int argv, char** args)
 
     clear(100, 100);
 
-    int planetIndex = 0;
-
     // Inicializar cámara
+    float cameraSpeed = 0.1f;
+
     Camera camera;
-    camera.cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
+    camera.cameraPosition = glm::vec3(0.0f, 0.0f, 10.0f);
     camera.targetPosition = glm::vec3(0.0f, 0.0f, 0.0f);
     camera.upVector = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -203,26 +198,47 @@ int main(int argv, char** args)
 
     glm::vec3 rotationAxis(0.0f, 1.0f, 0.0f); // Rotar alrededor del eje Y
 
-    // Preparar uniforms del planeta
-    Planet planet;
-    planet.name = "sun";
-    planet.translationVector = {0.0f, 0.0f, 0.0f};
-    planet.rotationAngle = 1.0;
-    planet.scaleFactor = {1.0f, 1.0f, 1.0f};
-    models.push_back(planet);
-    
+    // Preparar uniforms del Sol
+    Planet sun;
+    sun.name = "sun";
+    sun.worldPos = {0.0f, 0.0f, 0.0f};
+    sun.rotationAngle = 0.0f;
+    sun.scaleFactor = {1.0f, 1.0f, 1.0f};
+    sun.translationRadius = 0.0f;
+    sun.translationAxis = {0.0f, 0.0f, 0.0f};
+
+    // Preparar uniforms de Jupiter
+    Planet jupiter;
+    jupiter.name = "gas";
+    jupiter.worldPos = {2.0f, 0.0f, 0.0f};
+    jupiter.translationRadius = 2.0f;
+    jupiter.rotationAngle = 1.0f;
+    jupiter.scaleFactor = {0.7f, 0.7f, 0.7f};
+    jupiter.translationAngle = 1.0f;
+    jupiter.translationSpeed = 1.0f;
+    jupiter.translationAxis = sun.worldPos;
+
     // Preparar uniforms de la luna
     Planet moon;
     moon.name = "moon";
-    moon.translationVector = {1.0f, 0.3f, 0.0f};
-    moon.rotationAngle = 1.0;
+    moon.worldPos = {2.5f, 0.0f, 0.0f};
+    moon.translationRadius = 0.5f;
+    moon.rotationAngle = 0.0f;
     moon.scaleFactor = {0.2f, 0.2f, 0.2f};
+    moon.translationAngle = 1.0f;
+    moon.translationSpeed = 2.0f;
+    moon.translationAxis = jupiter.worldPos;
 
-    for (Planet planet : models) {
-        loadOBJ(modelPath, vertices, normals, faces);
-        verticesArray = setupVertexArray(vertices, normals, faces);
-        modelsVertices.push_back(verticesArray);
-    };
+    //PENDIENTE: diferenciar ángulo de rotación y velocidad de rotación
+
+    //Agregar satelites alrededor de sus correspondientes planetas
+    jupiter.satelites.push_back(moon);
+
+    // Agregar planetas alrededor del Sol
+    sun.satelites.push_back(jupiter);
+
+    loadOBJ(modelPath, vertices, normals, faces);
+    verticesArray = setupVertexArray(vertices, normals, faces);
 
     //Matriz de vista
 
@@ -238,25 +254,27 @@ int main(int argv, char** args)
             else if (event.type == SDL_KEYDOWN) {
                 switch (event.key.keysym.sym) {
                     case SDLK_RIGHT:
-                        if (planetIndex < 4) {
-                            planetIndex++;
-                            if (planetIndex == 2) models.pop_back();
-                            models.pop_back();
-                            planet.name = getCurrentPlanet(planetIndex);
-                            models.push_back(planet);
-                            if (planetIndex == 1) models.push_back(moon);
-                        }
+                        camera.targetPosition.x += cameraSpeed;
                         break;
 
                     case SDLK_LEFT:
-                        if (planetIndex > 0) {
-                            planetIndex--;
-                            if (planetIndex == 0) models.pop_back();
-                            models.pop_back();
-                            planet.name = getCurrentPlanet(planetIndex);
-                            models.push_back(planet);
-                            if (planetIndex == 1) models.push_back(moon);
-                        }
+                        camera.targetPosition.x -= cameraSpeed;
+                        break;
+
+                    case SDLK_UP:
+                        camera.cameraPosition.z -= cameraSpeed;
+                        break;
+
+                    case SDLK_DOWN:
+                        camera.cameraPosition.z += cameraSpeed;
+                        break;
+
+                    case SDLK_w:
+                        camera.targetPosition.y += cameraSpeed;
+                        break;
+
+                    case SDLK_s:
+                        camera.targetPosition.y -= cameraSpeed;
                         break;
 
                     default:
@@ -278,25 +296,23 @@ int main(int argv, char** args)
                 camera.upVector        // The up vector defining the camera's orientation
             );
 
-       
-        for (Planet model : models) {
+        // Renderizar el Sol
+        setUpRender(sun);
+        render(Primitive::TRIANGLES, sun.name);
 
-            if (model.name == "moon") {
-            model.translationVector.x = 1.0f * cos(glm::radians(rotationAngle));
-            model.translationVector.z = 1.0f * sin(glm::radians(rotationAngle));
+       
+        for (Planet& planet : sun.satelites) {
+            // Renderizar satelites
+            for (Planet& satellite : planet.satelites) {
+                satellite.translationAxis = planet.worldPos;
+                setUpRender(satellite);
+                render(Primitive::TRIANGLES, satellite.name);
+                renderBuffer(renderer);
             }
 
-            rotationAngle += model.rotationAngle;
-            glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(rotationAngle), rotationAxis);
-
-            glm::mat4 translation = glm::translate(glm::mat4(1.0f), model.translationVector);
-            glm::mat4 scale = glm::scale(glm::mat4(1.0f), model.scaleFactor);
-
-            // Calcular la matriz de modelo
-            uniforms.model = translation * rotation * scale;
-
-            render(Primitive::TRIANGLES, model.name);
-
+            // Renderizar planetas
+            setUpRender(planet);
+            render(Primitive::TRIANGLES, planet.name);
             renderBuffer(renderer);
 
         }
