@@ -207,35 +207,71 @@ int main(int argv, char** args)
     sun.translationRadius = 0.0f;
     sun.translationAxis = {0.0f, 0.0f, 0.0f};
 
+    //Preparar uniforms de la Tierra
+    Planet earth;
+    earth.name = "earth";
+    earth.worldPos = {2.0f, 0.0f, 0.0f};
+    earth.translationRadius = 2.0f;
+    earth.rotationAngle = 1.0f;
+    earth.scaleFactor = {0.5f, 0.5f, 0.5f};
+    earth.translationAngle = 0.0f;
+    earth.translationSpeed = 1.0f;
+    earth.translationAxis = sun.worldPos;
+
     // Preparar uniforms de Jupiter
     Planet jupiter;
     jupiter.name = "gas";
-    jupiter.worldPos = {2.0f, 0.0f, 0.0f};
-    jupiter.translationRadius = 2.0f;
+    jupiter.worldPos = {3.5f, 0.0f, 0.0f};
+    jupiter.translationRadius = 3.5f;
     jupiter.rotationAngle = 1.0f;
     jupiter.scaleFactor = {0.7f, 0.7f, 0.7f};
-    jupiter.translationAngle = 1.0f;
-    jupiter.translationSpeed = 1.0f;
+    jupiter.translationAngle = 0.0f;
+    jupiter.translationSpeed = 0.5f;
     jupiter.translationAxis = sun.worldPos;
+
+    // Preparar uniforms de planeta Diamante
+    Planet diamond;
+    diamond.name = "diamond";
+    diamond.worldPos = {1.0f, 0.0f, 0.0f};
+    diamond.translationRadius = 1.0f;
+    diamond.rotationAngle = 0.0f;
+    diamond.scaleFactor = {0.5f, 0.5f, 0.5f};
+    diamond.translationAngle = 0.0f;
+    diamond.translationSpeed = 2.0f;
+    diamond.translationAxis = sun.worldPos;
+
+    // Preparar uniforms de planeta Trippy
+    Planet trippy;
+    trippy.name = "slime";
+    trippy.worldPos = {5.0f, 0.0f, 0.0f};
+    trippy.translationRadius = 5.0f;
+    trippy.rotationAngle = 0.0f;
+    trippy.scaleFactor = {0.6f, 0.6f, 0.6f};
+    trippy.translationAngle = 0.0f;
+    trippy.translationSpeed = 0.3f;
+    trippy.translationAxis = sun.worldPos;
 
     // Preparar uniforms de la luna
     Planet moon;
     moon.name = "moon";
-    moon.worldPos = {2.5f, 0.0f, 0.0f};
+    moon.worldPos = {2.5f, 0.3f, 0.0f};
     moon.translationRadius = 0.5f;
     moon.rotationAngle = 0.0f;
     moon.scaleFactor = {0.2f, 0.2f, 0.2f};
     moon.translationAngle = 1.0f;
     moon.translationSpeed = 2.0f;
-    moon.translationAxis = jupiter.worldPos;
+    moon.translationAxis = earth.worldPos;
 
     //PENDIENTE: diferenciar ángulo de rotación y velocidad de rotación
 
     //Agregar satelites alrededor de sus correspondientes planetas
-    jupiter.satelites.push_back(moon);
+    earth.satelites.push_back(moon);
 
     // Agregar planetas alrededor del Sol
+    sun.satelites.push_back(trippy);
     sun.satelites.push_back(jupiter);
+    sun.satelites.push_back(earth);
+    sun.satelites.push_back(diamond);
 
     loadOBJ(modelPath, vertices, normals, faces);
     verticesArray = setupVertexArray(vertices, normals, faces);
