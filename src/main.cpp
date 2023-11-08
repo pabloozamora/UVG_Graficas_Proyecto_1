@@ -207,70 +207,133 @@ int main(int argv, char** args)
     sun.translationRadius = 0.0f;
     sun.translationAxis = {0.0f, 0.0f, 0.0f};
 
+    // Preparar uniforms de Mercurio
+    Planet mercury;
+    mercury.name = "mercury";
+    mercury.worldPos = {1.5f, 0.0f, 0.0f};
+    mercury.translationRadius = 1.5f;
+    mercury.rotationAngle = 1.0f;
+    mercury.scaleFactor = {0.5f, 0.5f, 0.5f};
+    mercury.translationAngle = 170.0f;
+    mercury.translationSpeed = 2.0f;
+    mercury.translationAxis = sun.worldPos;
+
+
     //Preparar uniforms de la Tierra
     Planet earth;
     earth.name = "earth";
-    earth.worldPos = {2.0f, 0.0f, 0.0f};
-    earth.translationRadius = 2.0f;
+    earth.translationRadius = 3.5f;
     earth.rotationAngle = 1.0f;
     earth.scaleFactor = {0.5f, 0.5f, 0.5f};
-    earth.translationAngle = 0.0f;
-    earth.translationSpeed = 1.0f;
+    earth.translationAngle = 100.0f;
+    earth.worldPos = {earth.translationRadius * cos(glm::radians(earth.translationAngle)), 0.0f, earth.translationRadius * sin(glm::radians(earth.translationAngle))};
+    earth.translationSpeed = 1.5f;
     earth.translationAxis = sun.worldPos;
+
+    //Preparar uniforms de Marte
+    Planet mars;
+    mars.name = "mars";
+    mars.worldPos = {4.5f, 0.0f, 0.0f};
+    mars.translationRadius = 4.5f;
+    mars.rotationAngle = 1.0f;
+    mars.scaleFactor = {0.5f, 0.5f, 0.5f};
+    mars.translationAngle = 0.0f;
+    mars.translationSpeed = 1.0f;
+    mars.translationAxis = sun.worldPos;
 
     // Preparar uniforms de Jupiter
     Planet jupiter;
     jupiter.name = "gas";
-    jupiter.worldPos = {3.5f, 0.0f, 0.0f};
-    jupiter.translationRadius = 3.5f;
+    jupiter.worldPos = {6.0f, 0.0f, 0.0f};
+    jupiter.translationRadius = 6.0f;
     jupiter.rotationAngle = 1.0f;
-    jupiter.scaleFactor = {0.7f, 0.7f, 0.7f};
+    jupiter.scaleFactor = {1.0f, 1.0f, 1.0f};
     jupiter.translationAngle = 0.0f;
     jupiter.translationSpeed = 0.5f;
     jupiter.translationAxis = sun.worldPos;
 
-    // Preparar uniforms de planeta Diamante
-    Planet diamond;
-    diamond.name = "diamond";
-    diamond.worldPos = {1.0f, 0.0f, 0.0f};
-    diamond.translationRadius = 1.0f;
-    diamond.rotationAngle = 0.0f;
-    diamond.scaleFactor = {0.5f, 0.5f, 0.5f};
-    diamond.translationAngle = 0.0f;
-    diamond.translationSpeed = 2.0f;
-    diamond.translationAxis = sun.worldPos;
-
     // Preparar uniforms de planeta Trippy
     Planet trippy;
     trippy.name = "slime";
-    trippy.worldPos = {5.0f, 0.0f, 0.0f};
-    trippy.translationRadius = 5.0f;
+    trippy.worldPos = {7.5f, 0.0f, 0.0f};
+    trippy.translationRadius = 7.5f;
     trippy.rotationAngle = 0.0f;
     trippy.scaleFactor = {0.6f, 0.6f, 0.6f};
-    trippy.translationAngle = 0.0f;
+    trippy.translationAngle = 300.0f;
     trippy.translationSpeed = 0.3f;
     trippy.translationAxis = sun.worldPos;
 
-    // Preparar uniforms de la luna
+    // Preparar uniforms de planeta Diamante
+    Planet diamond;
+    diamond.name = "diamond";
+    diamond.translationRadius = 9.0f;
+    diamond.translationAngle = 220.0f;
+    diamond.rotationAngle = 0.0f;
+    diamond.worldPos = {diamond.translationRadius * cos(glm::radians(diamond.translationAngle)), 0.0f, diamond.translationRadius * sin(glm::radians(diamond.translationAngle))};
+    diamond.scaleFactor = {0.5f, 0.5f, 0.5f};
+    diamond.translationSpeed = 0.3f;
+    diamond.translationAxis = sun.worldPos;
+
+    // Preparar uniforms de la Luna
     Planet moon;
     moon.name = "moon";
-    moon.worldPos = {2.5f, 0.3f, 0.0f};
     moon.translationRadius = 0.5f;
     moon.rotationAngle = 0.0f;
     moon.scaleFactor = {0.2f, 0.2f, 0.2f};
     moon.translationAngle = 1.0f;
     moon.translationSpeed = 2.0f;
     moon.translationAxis = earth.worldPos;
+    moon.worldPos = {moon.translationAxis.x + (moon.translationRadius * cos(glm::radians(moon.translationAngle))),
+                    0.3f,
+                    moon.translationAxis.z + (moon.translationRadius * sin(glm::radians(moon.translationAngle)))};
+
+    // Preparar uniforms de Phobos
+    Planet phobos;
+    phobos.name = "moon";
+    phobos.worldPos = {5.0f, 0.3f, 0.0f};
+    phobos.translationRadius = 0.5f;
+    phobos.rotationAngle = 0.0f;
+    phobos.scaleFactor = {0.2f, 0.2f, 0.2f};
+    phobos.translationAngle = 50.0f;
+    phobos.translationSpeed = 2.0f;
+    phobos.translationAxis = mars.worldPos;
+
+    // Preparar uniforms de Deimos
+    Planet deimos;
+    deimos.name = "moon";
+    deimos.worldPos = {4.7f, -0.3f, 0.0f};
+    deimos.translationRadius = 0.2f;
+    deimos.rotationAngle = 0.0f;
+    deimos.scaleFactor = {0.2f, 0.2f, 0.2f};
+    deimos.translationAngle = 150.0f;
+    deimos.translationSpeed = 2.0f;
+    deimos.translationAxis = mars.worldPos;
+
+    // Preparar uniforms de Europa
+    Planet europa;
+    europa.name = "moon";
+    europa.worldPos = {6.8f, 0.1f, 0.0f};
+    europa.translationRadius = 0.8f;
+    europa.rotationAngle = 0.0f;
+    europa.scaleFactor = {0.3f, 0.3f, 0.3f};
+    europa.translationAngle = 150.0f;
+    europa.translationSpeed = 3.0f;
+    europa.translationAxis = jupiter.worldPos;
 
     //PENDIENTE: diferenciar ángulo de rotación y velocidad de rotación
 
     //Agregar satelites alrededor de sus correspondientes planetas
     earth.satelites.push_back(moon);
+    mars.satelites.push_back(phobos);
+    mars.satelites.push_back(deimos);
+    jupiter.satelites.push_back(europa);
 
     // Agregar planetas alrededor del Sol
-    sun.satelites.push_back(trippy);
-    sun.satelites.push_back(jupiter);
+    sun.satelites.push_back(mercury);
     sun.satelites.push_back(earth);
+    sun.satelites.push_back(mars);
+    sun.satelites.push_back(jupiter);
+    sun.satelites.push_back(trippy);
     sun.satelites.push_back(diamond);
 
     loadOBJ(modelPath, vertices, normals, faces);

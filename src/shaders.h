@@ -10,6 +10,8 @@
 #include "./noises/diamondPlanetNoise.h"
 #include "./noises/gasPlanetNoise.h"
 #include "./noises/moonNoise.h"
+#include "./noises/mercuryNoise.h"
+#include "./noises/marsNoise.h"
 
 Vertex vertexShader(const Vertex& vertex, const Uniforms& uniforms) {
     // Aplicar las transformaciones al vértice utilizando las matrices de uniforms
@@ -62,6 +64,14 @@ Fragment fragmentShader(Fragment& fragment, const std::string name) {
 
     else if (name == "gas") {
         fragment.color = getGasPlanetNoise(x,y,z) * fragment.intensity;
+    }
+
+    else if (name == "mercury") {
+        fragment.color = getMercuryNoise(x,y,z) * fragment.intensity;
+    }
+
+    else if (name == "mars") {
+        fragment.color = getMarsNoise(x,y,z) * fragment.intensity;
     }
 
     return fragment;
