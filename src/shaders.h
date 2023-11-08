@@ -74,5 +74,9 @@ Fragment fragmentShader(Fragment& fragment, const std::string name) {
         fragment.color = getMarsNoise(x,y,z) * fragment.intensity;
     }
 
+    else if (name == "ship") {
+        fragment.color = fragment.color * fragment.intensity;
+    }
+
     return fragment;
 }

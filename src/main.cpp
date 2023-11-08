@@ -2,6 +2,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
+#include <string>
 #include "color.h"
 #include "objReader.h"
 #include "framebuffer.h"
@@ -9,21 +10,27 @@
 #include "shaders.h"
 #include "triangle.h"
 #include "camera.h"
-#include "planet.h"
-#include <string>
+#include "Planet.h"
+#include "SpaceShip.h"
 
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
 Color currentColor;
 
-const std::string modelPath = "../models/sphere.obj";
+const std::string modelPathSphere = "../models/sphere.obj";
+const std::string modelPathSpaceShip = "../models/spaceship.obj";
 Color clearColor(0, 0, 0);  // Color del fondo
 
 std::vector<glm::vec3> vertices;
 std::vector<glm::vec3> normals;
 std::vector<Face> faces;
 std::vector<Vertex> verticesArray;
-std::vector<std::vector<Vertex>> modelsVertices;
+
+std::vector<glm::vec3> spaceShipVertices;
+std::vector<glm::vec3> spaceShipNormals;
+std::vector<Face> spaceShipFaces;
+std::vector<Vertex> spaceShipVerticesArray;
+
 
 Uniforms uniforms;
 
@@ -125,12 +132,12 @@ glm::mat4 createViewportMatrix(size_t screenWidth, size_t screenHeight) {
     return viewport;
 }
 
-void render(Primitive polygon, std::string name){
+void render(Primitive polygon, std::string name, std::vector<Vertex>& modelVertices){
 
     // 1. Vertex Shader
     std::vector<Vertex> transformedVertices;
 
-    for (const Vertex& vertex : verticesArray) {
+    for (const Vertex& vertex : modelVertices) {
         transformedVertices.push_back(vertexShader(vertex, uniforms));
     }
 
@@ -184,7 +191,7 @@ int main(int argv, char** args)
     float cameraSpeed = 0.1f;
 
     Camera camera;
-    camera.cameraPosition = glm::vec3(0.0f, 0.0f, 10.0f);
+    camera.cameraPosition = glm::vec3(0.0f, 0.0f, 15.0f);
     camera.targetPosition = glm::vec3(0.0f, 0.0f, 0.0f);
     camera.upVector = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -336,7 +343,18 @@ int main(int argv, char** args)
     sun.satelites.push_back(trippy);
     sun.satelites.push_back(diamond);
 
-    loadOBJ(modelPath, vertices, normals, faces);
+    // Preparar uniforms de la nave
+    Spaceship spaceship;
+    spaceship.worldPos = {0.0f, -1.0f, 10.0f};
+    spaceship.scaleFactor = {0.1f, 0.1f, 0.1f};
+    spaceship.rotationAngle = 90.0f;
+
+    // Vertices de modelo spaceship
+    loadOBJ(modelPathSpaceShip, spaceShipVertices, spaceShipNormals, spaceShipFaces);
+    spaceShipVerticesArray = setupVertexArray(spaceShipVertices, spaceShipNormals, spaceShipFaces);
+
+    // Vertices de modelo esfera
+    loadOBJ(modelPathSphere, vertices, normals, faces);
     verticesArray = setupVertexArray(vertices, normals, faces);
 
     //Matriz de vista
@@ -361,11 +379,11 @@ int main(int argv, char** args)
                         break;
 
                     case SDLK_UP:
-                        camera.cameraPosition.z -= cameraSpeed;
+                        spaceship.worldPos.z -= cameraSpeed;
                         break;
 
                     case SDLK_DOWN:
-                        camera.cameraPosition.z += cameraSpeed;
+                        spaceship.worldPos.z += cameraSpeed;
                         break;
 
                     case SDLK_w:
@@ -388,6 +406,9 @@ int main(int argv, char** args)
 
         SDL_Delay(1);
 
+        // Actualizar cámara
+        camera.cameraPosition = {spaceship.worldPos.x, spaceship.worldPos.y + 0.1f, spaceship.worldPos.z + 6.0f};
+
         // Crear la matriz de vista usando el objeto cámara
             uniforms.view = glm::lookAt(
                 camera.cameraPosition, // The position of the camera
@@ -397,7 +418,14 @@ int main(int argv, char** args)
 
         // Renderizar el Sol
         setUpRender(sun);
-        render(Primitive::TRIANGLES, sun.name);
+        render(Primitive::TRIANGLES, sun.name, verticesArray);
+
+        // Renderizar nave
+        glm::mat4 spaceshipTranslation = glm::translate(glm::mat4(1.0f), spaceship.worldPos);
+        glm::mat4 spaceshipScale = glm::scale(glm::mat4(1.0f), spaceship.scaleFactor);
+        glm::mat4 spaceshipRotation = glm::rotate(glm::mat4(1.0f), glm::radians(spaceship.rotationAngle), rotationAxis);
+        uniforms.model = spaceshipTranslation * spaceshipRotation *  spaceshipScale;
+        render(Primitive::TRIANGLES, "ship", spaceShipVerticesArray);
 
        
         for (Planet& planet : sun.satelites) {
@@ -405,13 +433,13 @@ int main(int argv, char** args)
             for (Planet& satellite : planet.satelites) {
                 satellite.translationAxis = planet.worldPos;
                 setUpRender(satellite);
-                render(Primitive::TRIANGLES, satellite.name);
+                render(Primitive::TRIANGLES, satellite.name, verticesArray);
                 renderBuffer(renderer);
             }
 
             // Renderizar planetas
             setUpRender(planet);
-            render(Primitive::TRIANGLES, planet.name);
+            render(Primitive::TRIANGLES, planet.name, verticesArray);
             renderBuffer(renderer);
 
         }
