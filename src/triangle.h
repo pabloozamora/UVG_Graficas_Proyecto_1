@@ -6,7 +6,7 @@
 
 #pragma once
 
-glm::vec3 L = glm::vec3(0.0f, 0.0f, 1.0f);
+glm::vec3 L = glm::vec3(0.0f, 0.0f, 0.0f);
 
 std::pair<float, float> barycentricCoordinates(const glm::ivec2& P, const glm::vec3& A, const glm::vec3& B, const glm::vec3& C) {
     glm::vec3 bary = glm::cross(
@@ -24,7 +24,7 @@ std::pair<float, float> barycentricCoordinates(const glm::ivec2& P, const glm::v
     );    
 }
 
-std::vector<Fragment> triangle(const Vertex& a, const Vertex& b, const Vertex& c) {
+std::vector<Fragment> triangle(const Vertex& a, const Vertex& b, const Vertex& c, std::string name, glm::vec3 worldPos) {
 
     std::vector<Fragment> fragments;
   glm::vec3 A = a.position;
@@ -58,11 +58,14 @@ std::vector<Fragment> triangle(const Vertex& a, const Vertex& b, const Vertex& c
            a.normal * w + b.normal * v + c.normal * u
        );
        
+
+      L = -worldPos;
+      L = glm::normalize(L);
       //normal = a.normal; // assume flatness
       float intensity = glm::dot(normal, L);
       
-      if (intensity < 0)
-        continue;
+      if (intensity < 0 && name != "sun" && name !="ship")
+        intensity = 0;
 
       glm::vec3 originalPos = a.originalPos * w + b.originalPos * v + c.originalPos * u;
 

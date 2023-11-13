@@ -91,14 +91,14 @@ std::vector<std::vector<Vertex>> primitiveAssembly(
     return assembledVertices;
 }
 
-std::vector<Fragment> rasterize(Primitive primitive, const std::vector<std::vector<Vertex>>& assembledVertices) {
+std::vector<Fragment> rasterize(Primitive primitive, const std::vector<std::vector<Vertex>>& assembledVertices, std::string name, glm::vec3 worldPos) {
     std::vector<Fragment> fragments;
 
     switch (primitive) {
         case Primitive::TRIANGLES: {
             for (const std::vector<Vertex>& triangleVertices : assembledVertices) {
                 assert(triangleVertices.size() == 3 && "Triangle vertices must contain exactly 3 vertices.");
-                std::vector<Fragment> triangleFragments = triangle(triangleVertices[0], triangleVertices[1], triangleVertices[2]);
+                std::vector<Fragment> triangleFragments = triangle(triangleVertices[0], triangleVertices[1], triangleVertices[2], name, worldPos);
                 fragments.insert(fragments.end(), triangleFragments.begin(), triangleFragments.end());
             }
             break;
@@ -132,7 +132,7 @@ glm::mat4 createViewportMatrix(size_t screenWidth, size_t screenHeight) {
     return viewport;
 }
 
-void render(Primitive polygon, std::string name, std::vector<Vertex>& modelVertices){
+void render(Primitive polygon, std::string name, std::vector<Vertex>& modelVertices, glm::vec3 worldPos){
 
     // 1. Vertex Shader
     std::vector<Vertex> transformedVertices;
@@ -145,7 +145,7 @@ void render(Primitive polygon, std::string name, std::vector<Vertex>& modelVerti
     std::vector<std::vector<Vertex>> assembledVertices = primitiveAssembly(polygon, transformedVertices);
 
     // 3. Rasterization
-    std::vector<Fragment> fragments = rasterize(polygon, assembledVertices);
+    std::vector<Fragment> fragments = rasterize(polygon, assembledVertices, name, worldPos);
 
     // 4. Fragment Shader
     for (Fragment& fragment : fragments) {
@@ -281,6 +281,17 @@ int main(int argv, char** args)
     diamond.translationSpeed = 0.3f;
     diamond.translationAxis = sun.worldPos;
 
+    //Planet test 270
+    Planet test;
+    test.name = "mars";
+    test.translationRadius = 30.0f;
+    test.translationAngle = 90.0f;
+    test.rotationAngle = 0.0f;
+    test.worldPos = {0.0f, 0.0f, 10.0f};
+    test.scaleFactor = {0.5f, 0.5f, 0.5f};
+    test.translationSpeed = 0.0f;
+    test.translationAxis = sun.worldPos;
+
     // Preparar uniforms de la Luna
     Planet moon;
     moon.name = "moon";
@@ -337,17 +348,19 @@ int main(int argv, char** args)
 
     // Agregar planetas alrededor del Sol
     sun.satelites.push_back(mercury);
-    sun.satelites.push_back(earth);
-    sun.satelites.push_back(mars);
-    sun.satelites.push_back(jupiter);
-    sun.satelites.push_back(trippy);
-    sun.satelites.push_back(diamond);
+    sun.satelites.push_back(test);
+    //sun.satelites.push_back(earth);
+    //sun.satelites.push_back(mars);
+    //sun.satelites.push_back(jupiter);
+    //sun.satelites.push_back(trippy);
+    //sun.satelites.push_back(diamond);
 
     // Preparar uniforms de la nave
     Spaceship spaceship;
-    spaceship.worldPos = {0.0f, -1.0f, 10.0f};
+    spaceship.worldPos = {0.0f, 0.5f, 20.0f};
     spaceship.scaleFactor = {0.1f, 0.1f, 0.1f};
     spaceship.rotationAngle = 90.0f;
+    spaceship.rotationSpeed = 45.0f;
 
     // Vertices de modelo spaceship
     loadOBJ(modelPathSpaceShip, spaceShipVertices, spaceShipNormals, spaceShipFaces);
@@ -371,11 +384,27 @@ int main(int argv, char** args)
             else if (event.type == SDL_KEYDOWN) {
                 switch (event.key.keysym.sym) {
                     case SDLK_RIGHT:
-                        camera.targetPosition.x += cameraSpeed;
+                        if (spaceship.rotationAngle - spaceship.rotationSpeed == 0.0f) {
+                            spaceship.rotationAngle = 360.0f;
+                        }
+                        else {
+                            spaceship.rotationAngle -= spaceship.rotationSpeed;
+                        }
+                        SDL_Log("rotation angle: %f", spaceship.rotationAngle);
+                        SDL_Log("Spaceship position: %f %f", spaceship.worldPos.x, spaceship.worldPos.z);
+                        SDL_Log("Camera position: %f %f", camera.cameraPosition.x, camera.cameraPosition.z);
                         break;
 
                     case SDLK_LEFT:
-                        camera.targetPosition.x -= cameraSpeed;
+                        if (spaceship.rotationAngle + spaceship.rotationSpeed > 360.0f) {
+                            spaceship.rotationAngle = spaceship.rotationSpeed;
+                        }
+                        else {
+                            spaceship.rotationAngle += spaceship.rotationSpeed;
+                        }
+                        SDL_Log("rotation angle: %f", spaceship.rotationAngle);
+                        SDL_Log("Spaceship position: %f %f", spaceship.worldPos.x, spaceship.worldPos.z);
+                        SDL_Log("Camera position: %f %f", camera.cameraPosition.x, camera.cameraPosition.z);
                         break;
 
                     case SDLK_UP:
@@ -404,10 +433,7 @@ int main(int argv, char** args)
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        SDL_Delay(1);
-
         // Actualizar cámara
-        camera.cameraPosition = {spaceship.worldPos.x, spaceship.worldPos.y + 0.1f, spaceship.worldPos.z + 6.0f};
 
         // Crear la matriz de vista usando el objeto cámara
             uniforms.view = glm::lookAt(
@@ -418,14 +444,59 @@ int main(int argv, char** args)
 
         // Renderizar el Sol
         setUpRender(sun);
-        render(Primitive::TRIANGLES, sun.name, verticesArray);
+        render(Primitive::TRIANGLES, sun.name, verticesArray, sun.worldPos);
 
         // Renderizar nave
         glm::mat4 spaceshipTranslation = glm::translate(glm::mat4(1.0f), spaceship.worldPos);
         glm::mat4 spaceshipScale = glm::scale(glm::mat4(1.0f), spaceship.scaleFactor);
         glm::mat4 spaceshipRotation = glm::rotate(glm::mat4(1.0f), glm::radians(spaceship.rotationAngle), rotationAxis);
         uniforms.model = spaceshipTranslation * spaceshipRotation *  spaceshipScale;
-        render(Primitive::TRIANGLES, "ship", spaceShipVerticesArray);
+
+        float d = 4.0f; //Distancia de camara a nave
+        
+        // Determinar posición de la cámara
+        float cameraAngle;
+        float dx;
+        float dz;
+
+        if (spaceship.rotationAngle > 0 && spaceship.rotationAngle <= 90) {
+            // I cuadrante: de 1 a 90
+            cameraAngle = spaceship.rotationAngle;
+            dz = d * sin(glm::radians(cameraAngle));
+            dx = d * cos(glm::radians(cameraAngle));
+            camera.cameraPosition = {spaceship.worldPos.x - dx, 1.0f, spaceship.worldPos.z + dz};
+        }
+
+        else if (spaceship.rotationAngle > 90 && spaceship.rotationAngle <= 180) {
+            // II cuadrante: de 91 a 180
+            cameraAngle = spaceship.rotationAngle - 90.0f;
+            dz = d * cos(glm::radians(cameraAngle));
+            dx = d * sin(glm::radians(cameraAngle));
+            camera.cameraPosition = {spaceship.worldPos.x + dx, 1.0f, spaceship.worldPos.z + dz};
+        }
+
+        else if (spaceship.rotationAngle > 180 && spaceship.rotationAngle <= 270) {
+            // III cuadrante: de 181 a 270
+            cameraAngle = spaceship.rotationAngle - 180.0f;
+            dz = d * sin(glm::radians(cameraAngle));
+            dx = d * cos(glm::radians(cameraAngle));
+            camera.cameraPosition = {spaceship.worldPos.x + dx, 1.0f, spaceship.worldPos.z - dz};
+        }
+
+        else if (spaceship.rotationAngle > 270 && spaceship.rotationAngle <= 360) {
+            // IV cuadrante: de 271 a 360
+            cameraAngle = spaceship.rotationAngle - 270.0f;
+            dz = d * cos(glm::radians(cameraAngle));
+            dx = d * sin(glm::radians(cameraAngle));
+            camera.cameraPosition = {spaceship.worldPos.x - dx, 1.0f, spaceship.worldPos.z - dz};
+        }
+
+        
+
+        //Cambiar lookAt de camera
+        camera.targetPosition = spaceship.worldPos;
+
+        render(Primitive::TRIANGLES, "ship", spaceShipVerticesArray, spaceship.worldPos);
 
        
         for (Planet& planet : sun.satelites) {
@@ -433,13 +504,13 @@ int main(int argv, char** args)
             for (Planet& satellite : planet.satelites) {
                 satellite.translationAxis = planet.worldPos;
                 setUpRender(satellite);
-                render(Primitive::TRIANGLES, satellite.name, verticesArray);
+                render(Primitive::TRIANGLES, satellite.name, verticesArray, satellite.worldPos);
                 renderBuffer(renderer);
             }
 
             // Renderizar planetas
             setUpRender(planet);
-            render(Primitive::TRIANGLES, planet.name, verticesArray);
+            render(Primitive::TRIANGLES, planet.name, verticesArray, planet.worldPos);
             renderBuffer(renderer);
 
         }
