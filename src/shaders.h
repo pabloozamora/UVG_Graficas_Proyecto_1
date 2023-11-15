@@ -30,7 +30,8 @@ Vertex vertexShader(const Vertex& vertex, const Uniforms& uniforms) {
     return Vertex{
         glm::vec3(screenVertex),
         transformedNormal,
-        vertex.position
+        vertex.position,
+        clipSpaceVertex.w > 4.0f,
     };
 }
 
@@ -59,7 +60,7 @@ Fragment fragmentShader(Fragment& fragment, const std::string name) {
     }
 
     else if (name == "slime") {
-        fragment.color = getSlimePlanetNoise(x,y,z) * fragment.intensity;
+        fragment.color = getSlimePlanetNoise(x,y,z) * 1.0f;
     }
 
     else if (name == "gas") {

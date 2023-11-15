@@ -185,7 +185,7 @@ int main(int argv, char** args)
         return 1;
     }
 
-    clear(100, 100);
+    clear(10, 10);
 
     // Inicializar cámara
     float cameraSpeed = 0.1f;
@@ -210,92 +210,70 @@ int main(int argv, char** args)
     sun.name = "sun";
     sun.worldPos = {0.0f, 0.0f, 0.0f};
     sun.rotationAngle = 0.0f;
-    sun.scaleFactor = {1.0f, 1.0f, 1.0f};
+    sun.scaleFactor = {1.5f, 1.5f, 1.5f};
     sun.translationRadius = 0.0f;
     sun.translationAxis = {0.0f, 0.0f, 0.0f};
 
     // Preparar uniforms de Mercurio
     Planet mercury;
     mercury.name = "mercury";
-    mercury.worldPos = {1.5f, 0.0f, 0.0f};
-    mercury.translationRadius = 1.5f;
+    mercury.translationRadius = 2.0f;
     mercury.rotationAngle = 1.0f;
-    mercury.scaleFactor = {0.5f, 0.5f, 0.5f};
+    mercury.scaleFactor = {1.0f, 1.0f, 1.0f};
     mercury.translationAngle = 170.0f;
-    mercury.translationSpeed = 2.0f;
+    mercury.translationSpeed = 1.0f;
+    mercury.worldPos = {mercury.translationRadius * cos(glm::radians(mercury.translationAngle)), 0.0f, mercury.translationRadius * sin(glm::radians(mercury.translationAngle))};
     mercury.translationAxis = sun.worldPos;
 
 
     //Preparar uniforms de la Tierra
     Planet earth;
     earth.name = "earth";
-    earth.translationRadius = 3.5f;
+    earth.translationRadius = 4.0f;
     earth.rotationAngle = 1.0f;
-    earth.scaleFactor = {0.5f, 0.5f, 0.5f};
+    earth.scaleFactor = {1.0f, 1.0f, 1.0f};
     earth.translationAngle = 100.0f;
     earth.worldPos = {earth.translationRadius * cos(glm::radians(earth.translationAngle)), 0.0f, earth.translationRadius * sin(glm::radians(earth.translationAngle))};
-    earth.translationSpeed = 1.5f;
+    earth.translationSpeed = 0.5f;
     earth.translationAxis = sun.worldPos;
 
     //Preparar uniforms de Marte
     Planet mars;
     mars.name = "mars";
-    mars.worldPos = {4.5f, 0.0f, 0.0f};
-    mars.translationRadius = 4.5f;
+    mars.translationRadius = 7.0f;
     mars.rotationAngle = 1.0f;
-    mars.scaleFactor = {0.5f, 0.5f, 0.5f};
+    mars.scaleFactor = {0.8f, 0.8f, 0.8f};
     mars.translationAngle = 0.0f;
-    mars.translationSpeed = 1.0f;
+    mars.translationSpeed = 0.3f;
+    mars.worldPos = {mars.translationRadius * cos(glm::radians(mars.translationAngle)), 0.0f, mars.translationRadius * sin(glm::radians(mars.translationAngle))};
     mars.translationAxis = sun.worldPos;
 
     // Preparar uniforms de Jupiter
     Planet jupiter;
     jupiter.name = "gas";
-    jupiter.worldPos = {6.0f, 0.0f, 0.0f};
-    jupiter.translationRadius = 6.0f;
+    jupiter.translationRadius = 12.0f;
     jupiter.rotationAngle = 1.0f;
-    jupiter.scaleFactor = {1.0f, 1.0f, 1.0f};
+    jupiter.scaleFactor = {1.3f, 1.3f, 1.3f};
     jupiter.translationAngle = 0.0f;
     jupiter.translationSpeed = 0.5f;
+    jupiter.worldPos = {jupiter.translationRadius * cos(glm::radians(jupiter.translationAngle)), 0.0f, jupiter.translationRadius * sin(glm::radians(jupiter.translationAngle))};
     jupiter.translationAxis = sun.worldPos;
 
     // Preparar uniforms de planeta Trippy
     Planet trippy;
     trippy.name = "slime";
-    trippy.worldPos = {7.5f, 0.0f, 0.0f};
-    trippy.translationRadius = 7.5f;
+    trippy.translationRadius = 15.0f;
     trippy.rotationAngle = 0.0f;
-    trippy.scaleFactor = {0.6f, 0.6f, 0.6f};
+    trippy.scaleFactor = {1.1f, 1.1f, 1.1f};
     trippy.translationAngle = 300.0f;
     trippy.translationSpeed = 0.3f;
+    trippy.worldPos = {trippy.translationRadius * cos(glm::radians(trippy.translationAngle)), 0.0f, trippy.translationRadius * sin(glm::radians(trippy.translationAngle))};
     trippy.translationAxis = sun.worldPos;
-
-    // Preparar uniforms de planeta Diamante
-    Planet diamond;
-    diamond.name = "diamond";
-    diamond.translationRadius = 9.0f;
-    diamond.translationAngle = 220.0f;
-    diamond.rotationAngle = 0.0f;
-    diamond.worldPos = {diamond.translationRadius * cos(glm::radians(diamond.translationAngle)), 0.0f, diamond.translationRadius * sin(glm::radians(diamond.translationAngle))};
-    diamond.scaleFactor = {0.5f, 0.5f, 0.5f};
-    diamond.translationSpeed = 0.3f;
-    diamond.translationAxis = sun.worldPos;
-
-    //Planet test 270
-    Planet test;
-    test.name = "mars";
-    test.translationRadius = 30.0f;
-    test.translationAngle = 90.0f;
-    test.rotationAngle = 0.0f;
-    test.worldPos = {0.0f, 0.0f, 10.0f};
-    test.scaleFactor = {0.5f, 0.5f, 0.5f};
-    test.translationSpeed = 0.0f;
-    test.translationAxis = sun.worldPos;
 
     // Preparar uniforms de la Luna
     Planet moon;
     moon.name = "moon";
-    moon.translationRadius = 0.5f;
+    moon.translationRadius = 1.0f;
     moon.rotationAngle = 0.0f;
     moon.scaleFactor = {0.2f, 0.2f, 0.2f};
     moon.translationAngle = 1.0f;
@@ -308,37 +286,41 @@ int main(int argv, char** args)
     // Preparar uniforms de Phobos
     Planet phobos;
     phobos.name = "moon";
-    phobos.worldPos = {5.0f, 0.3f, 0.0f};
-    phobos.translationRadius = 0.5f;
+    phobos.translationRadius = 1.0f;
     phobos.rotationAngle = 0.0f;
     phobos.scaleFactor = {0.2f, 0.2f, 0.2f};
     phobos.translationAngle = 50.0f;
     phobos.translationSpeed = 2.0f;
     phobos.translationAxis = mars.worldPos;
+    phobos.worldPos = {phobos.translationAxis.x + (phobos.translationRadius * cos(glm::radians(phobos.translationAngle))),
+                    0.3f,
+                    phobos.translationAxis.z + (phobos.translationRadius * sin(glm::radians(phobos.translationAngle)))};
 
     // Preparar uniforms de Deimos
     Planet deimos;
     deimos.name = "moon";
-    deimos.worldPos = {4.7f, -0.3f, 0.0f};
-    deimos.translationRadius = 0.2f;
+    deimos.translationRadius = 0.7f;
     deimos.rotationAngle = 0.0f;
     deimos.scaleFactor = {0.2f, 0.2f, 0.2f};
     deimos.translationAngle = 150.0f;
     deimos.translationSpeed = 2.0f;
     deimos.translationAxis = mars.worldPos;
+    deimos.worldPos = {deimos.translationAxis.x + (deimos.translationRadius * cos(glm::radians(deimos.translationAngle))),
+                    -0.3f,
+                    deimos.translationAxis.z + (deimos.translationRadius * sin(glm::radians(deimos.translationAngle)))};
 
     // Preparar uniforms de Europa
     Planet europa;
     europa.name = "moon";
-    europa.worldPos = {6.8f, 0.1f, 0.0f};
-    europa.translationRadius = 0.8f;
+    europa.translationRadius = 1.3f;
     europa.rotationAngle = 0.0f;
     europa.scaleFactor = {0.3f, 0.3f, 0.3f};
     europa.translationAngle = 150.0f;
     europa.translationSpeed = 3.0f;
     europa.translationAxis = jupiter.worldPos;
-
-    //PENDIENTE: diferenciar ángulo de rotación y velocidad de rotación
+    europa.worldPos = {europa.translationAxis.x + (europa.translationRadius * cos(glm::radians(europa.translationAngle))),
+                    0.1f,
+                    europa.translationAxis.z + (europa.translationRadius * sin(glm::radians(europa.translationAngle)))};
 
     //Agregar satelites alrededor de sus correspondientes planetas
     earth.satelites.push_back(moon);
@@ -348,19 +330,18 @@ int main(int argv, char** args)
 
     // Agregar planetas alrededor del Sol
     sun.satelites.push_back(mercury);
-    sun.satelites.push_back(test);
-    //sun.satelites.push_back(earth);
-    //sun.satelites.push_back(mars);
-    //sun.satelites.push_back(jupiter);
-    //sun.satelites.push_back(trippy);
-    //sun.satelites.push_back(diamond);
+    sun.satelites.push_back(earth);
+    sun.satelites.push_back(mars);
+    sun.satelites.push_back(jupiter);
+    sun.satelites.push_back(trippy);
 
     // Preparar uniforms de la nave
     Spaceship spaceship;
-    spaceship.worldPos = {0.0f, 0.5f, 20.0f};
-    spaceship.scaleFactor = {0.1f, 0.1f, 0.1f};
+    spaceship.worldPos = {0.0f, 0.0f, 20.0f};
+    spaceship.scaleFactor = {0.03f, 0.03f, 0.03f};
     spaceship.rotationAngle = 90.0f;
-    spaceship.rotationSpeed = 45.0f;
+    spaceship.rotationSpeed = 2.0f;
+    spaceship.movementSpeed = 1.0f;
 
     // Vertices de modelo spaceship
     loadOBJ(modelPathSpaceShip, spaceShipVertices, spaceShipNormals, spaceShipFaces);
@@ -390,9 +371,6 @@ int main(int argv, char** args)
                         else {
                             spaceship.rotationAngle -= spaceship.rotationSpeed;
                         }
-                        SDL_Log("rotation angle: %f", spaceship.rotationAngle);
-                        SDL_Log("Spaceship position: %f %f", spaceship.worldPos.x, spaceship.worldPos.z);
-                        SDL_Log("Camera position: %f %f", camera.cameraPosition.x, camera.cameraPosition.z);
                         break;
 
                     case SDLK_LEFT:
@@ -402,25 +380,21 @@ int main(int argv, char** args)
                         else {
                             spaceship.rotationAngle += spaceship.rotationSpeed;
                         }
-                        SDL_Log("rotation angle: %f", spaceship.rotationAngle);
-                        SDL_Log("Spaceship position: %f %f", spaceship.worldPos.x, spaceship.worldPos.z);
-                        SDL_Log("Camera position: %f %f", camera.cameraPosition.x, camera.cameraPosition.z);
                         break;
 
                     case SDLK_UP:
-                        spaceship.worldPos.z -= cameraSpeed;
+                        spaceship.worldPos.z -= spaceship.movementSpeed * sin(glm::radians(spaceship.rotationAngle));
+                        spaceship.worldPos.x += spaceship.movementSpeed * cos(glm::radians(spaceship.rotationAngle));
                         break;
 
                     case SDLK_DOWN:
-                        spaceship.worldPos.z += cameraSpeed;
+                        spaceship.worldPos.z += spaceship.movementSpeed * sin(glm::radians(spaceship.rotationAngle));
+                        spaceship.worldPos.x -= spaceship.movementSpeed * cos(glm::radians(spaceship.rotationAngle));
                         break;
 
-                    case SDLK_w:
-                        camera.targetPosition.y += cameraSpeed;
-                        break;
-
-                    case SDLK_s:
-                        camera.targetPosition.y -= cameraSpeed;
+                    case SDLK_r:
+                        spaceship.worldPos = {0.0f, 0.0f, 20.0f};
+                        spaceship.rotationAngle = 90.0f;
                         break;
 
                     default:
@@ -429,7 +403,7 @@ int main(int argv, char** args)
             }
         }
 
-        clear(100, 100);
+        clear(10, 10);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
@@ -452,7 +426,7 @@ int main(int argv, char** args)
         glm::mat4 spaceshipRotation = glm::rotate(glm::mat4(1.0f), glm::radians(spaceship.rotationAngle), rotationAxis);
         uniforms.model = spaceshipTranslation * spaceshipRotation *  spaceshipScale;
 
-        float d = 4.0f; //Distancia de camara a nave
+        float d = 5.0f; //Distancia de camara a nave
         
         // Determinar posición de la cámara
         float cameraAngle;

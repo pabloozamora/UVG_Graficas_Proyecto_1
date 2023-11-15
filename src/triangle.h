@@ -26,7 +26,11 @@ std::pair<float, float> barycentricCoordinates(const glm::ivec2& P, const glm::v
 
 std::vector<Fragment> triangle(const Vertex& a, const Vertex& b, const Vertex& c, std::string name, glm::vec3 worldPos) {
 
-    std::vector<Fragment> fragments;
+  std::vector<Fragment> fragments;
+
+  if (!a.renderize && !b.renderize && !c.renderize)
+        return fragments;
+
   glm::vec3 A = a.position;
   glm::vec3 B = b.position;
   glm::vec3 C = c.position;
