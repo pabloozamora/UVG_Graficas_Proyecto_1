@@ -179,6 +179,83 @@ void setUpRender(Planet& model) {
     uniforms.model = translation * rotation * scale;
 }
 
+void setUpOrbit(Planet& planet) {
+    // Agregar puntos para 360 grados
+    std::vector<Vertex> orbitsVertices;
+    for (float i = 0.0f; i < 360.0f; i += 1.0f)
+    {
+
+      Vertex vertex = {glm::vec3(planet.translationAxis.x + planet.translationRadius * cos(glm::radians(i)),
+                        0.0f,
+                        planet.translationAxis.z + planet.translationRadius * sin(glm::radians(i))),
+                        glm::vec3(1.0f)};
+      Vertex transformedVertex = vertexShader(vertex, uniforms);
+      orbitsVertices.push_back(transformedVertex);
+    }
+
+    for (Vertex vert : orbitsVertices)
+    {
+
+      if (vert.position.x < 0 || vert.position.y < 0  ||  vert.position.y > SCREEN_HEIGHT || vert.position.x > SCREEN_WIDTH) 
+        continue;
+
+      Fragment fragment = {
+          vert.position,
+          Color(255, 255, 255),
+          vert.position.z,
+          1.0f,
+          vert.position};
+      point(fragment);
+    }
+}
+
+void fastTravel(SDL_Renderer* renderer, const Camera& camera) {
+    FastNoiseLite noise;
+    noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+
+    Uint32 startTime = SDL_GetTicks(); 
+    const Uint32 animationDuration = 750; 
+
+    while (true) {
+        Uint32 currentTime = SDL_GetTicks();  
+
+        Uint32 elapsedTime = currentTime - startTime;
+
+        if (elapsedTime >= animationDuration) {
+            break; 
+        }
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
+        for (int y = 0; y < SCREEN_HEIGHT; y += 2) {
+            for (int x = 0; x < SCREEN_WIDTH; x += 2) {
+                float noiseValue = noise.GetNoise((x + camera.cameraPosition.x) * 30.0f, (y + camera.cameraPosition.y) * 30.0f);
+
+                if (noiseValue > 0.75f) {
+                    SDL_SetRenderDrawColor(renderer, 225, 225, 225, 225);
+
+                    if (x < SCREEN_WIDTH / 2 && y < SCREEN_HEIGHT / 2)
+                    SDL_RenderDrawLine(renderer, x - elapsedTime / 100, y - elapsedTime / 100, x, y );
+
+                    else if (x > SCREEN_WIDTH / 2 && y < SCREEN_HEIGHT / 2)
+                    SDL_RenderDrawLine(renderer, x + elapsedTime / 100, y - elapsedTime / 100, x, y);
+
+                    else if (x < SCREEN_WIDTH / 2 && y > SCREEN_HEIGHT / 2)
+                    SDL_RenderDrawLine(renderer, x - elapsedTime / 100, y + elapsedTime / 100, x, y);
+
+                    else if (x > SCREEN_WIDTH / 2 && y > SCREEN_HEIGHT / 2)
+                    SDL_RenderDrawLine(renderer, x + elapsedTime / 100, y + elapsedTime / 100, x, y);
+                }
+            }
+        }
+
+        SDL_RenderPresent(renderer);
+
+        SDL_Delay(10);  
+    }
+}
+
 int main(int argv, char** args)
 {
     if (!init()) {
@@ -393,7 +470,38 @@ int main(int argv, char** args)
                         break;
 
                     case SDLK_r:
+                        fastTravel(renderer, camera);
                         spaceship.worldPos = {0.0f, 0.0f, 20.0f};
+                        spaceship.rotationAngle = 90.0f;
+                        break;
+
+                    case SDLK_1:
+                        fastTravel(renderer, camera);
+                        spaceship.worldPos = {sun.satelites[0].worldPos.x, 0.0f, sun.satelites[0].worldPos.z + 1.0f};
+                        spaceship.rotationAngle = 90.0f;
+                        break;
+
+                    case SDLK_2:
+                        fastTravel(renderer, camera);
+                        spaceship.worldPos = {sun.satelites[1].worldPos.x, 0.0f, sun.satelites[1].worldPos.z + 1.0f};
+                        spaceship.rotationAngle = 90.0f;
+                        break;
+
+                    case SDLK_3:
+                        fastTravel(renderer, camera);
+                        spaceship.worldPos = {sun.satelites[2].worldPos.x, 0.0f, sun.satelites[2].worldPos.z + 1.0f};
+                        spaceship.rotationAngle = 90.0f;
+                        break;
+
+                    case SDLK_4:
+                        fastTravel(renderer, camera);
+                        spaceship.worldPos = {sun.satelites[3].worldPos.x, 0.0f, sun.satelites[3].worldPos.z + 1.5f};
+                        spaceship.rotationAngle = 90.0f;
+                        break;
+
+                    case SDLK_5:
+                        fastTravel(renderer, camera);
+                        spaceship.worldPos = {sun.satelites[4].worldPos.x, 0.0f, sun.satelites[4].worldPos.z + 1.5f};
                         spaceship.rotationAngle = 90.0f;
                         break;
 
@@ -419,6 +527,11 @@ int main(int argv, char** args)
         // Renderizar el Sol
         setUpRender(sun);
         render(Primitive::TRIANGLES, sun.name, verticesArray, sun.worldPos);
+
+        // Renderizar orbitas
+        /* for (Planet& planet : sun.satelites) {
+            setUpOrbit(planet);
+        } */
 
         // Renderizar nave
         glm::mat4 spaceshipTranslation = glm::translate(glm::mat4(1.0f), spaceship.worldPos);
@@ -467,7 +580,7 @@ int main(int argv, char** args)
 
         
 
-        //Cambiar lookAt de camera
+        //Actualizar lookAt de camera
         camera.targetPosition = spaceship.worldPos;
 
         render(Primitive::TRIANGLES, "ship", spaceShipVerticesArray, spaceship.worldPos);

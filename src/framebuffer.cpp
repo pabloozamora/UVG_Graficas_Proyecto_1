@@ -22,13 +22,12 @@ FragColor star{
 std::array<FragColor, width * height> framebuffer;
 
 void clear(int ox, int oy) {
-    //std::fill(framebuffer.begin(), framebuffer.end(), blank);
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
              FastNoiseLite noiseGenerator;
             noiseGenerator.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
 
-            float scale = 1000.0f;
+            float scale = 100.0f;
             float noiseValue = noiseGenerator.GetNoise((x + (ox * 100.0f)) * scale, (y + oy * 100.0f) * scale);
 
             // If the noise value is above a threshold, draw a star
