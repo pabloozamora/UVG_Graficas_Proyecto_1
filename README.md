@@ -32,11 +32,10 @@ Finalmente, la nave puede transportarse rápidamente a cualquiera de los planeta
 - 5: Fast travel a Planeta Trippy.
 
 ## Demo
-<br>
 https://github.com/pabloozamora/UVG_Graficas_Proyecto_1/assets/77593400/3f332e98-6e64-4843-a0f7-d22c6bd48308
-<br>
+<br><br>
 Debido a que las óribtas no podían distinguirse del todo con el skybox, aquí hay un pequeño demo de cómo se ven sin este:
-<br>
+<br><br>
 https://github.com/pabloozamora/UVG_Graficas_Proyecto_1/assets/77593400/c3830770-f8cd-41e3-aaf3-fd4d6c07e0fe
 
 
