@@ -1,3 +1,4 @@
+
 # UVG_Graficas_Proyecto_1
 Universidad del Valle de Guatemala<br>
 Gráficas por computadora<br>
@@ -32,11 +33,17 @@ Finalmente, la nave puede transportarse rápidamente a cualquiera de los planeta
 - 5: Fast travel a Planeta Trippy.
 
 ## Demo
-![no_orbits_demo](https://github.com/pabloozamora/UVG_Graficas_Proyecto_1/assets/77593400/3f332e98-6e64-4843-a0f7-d22c6bd48308)
-<br><br>
+
+<video src='https://github.com/pabloozamora/UVG_Graficas_Proyecto_1/assets/77593400/ac0299c1-1063-4a9d-abb8-0418650cee6e' width=180/></video>
+<br>
 Debido a que las óribtas no podían distinguirse del todo con el skybox, aquí hay un pequeño demo de cómo se ven sin este:
 <br><br>
-![orbits_demo](https://github.com/pabloozamora/UVG_Graficas_Proyecto_1/assets/77593400/c3830770-f8cd-41e3-aaf3-fd4d6c07e0fe)
+<video src='https://github.com/pabloozamora/UVG_Graficas_Proyecto_1/assets/77593400/0e6853d4-6fec-4162-823b-174aa19a4e4b' width=180/></video>
+
+
+
+
+
 
 
 
