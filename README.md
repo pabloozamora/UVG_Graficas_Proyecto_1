@@ -35,7 +35,6 @@ Finalmente, la nave puede transportarse rápidamente a cualquiera de los planeta
 ## Demo
 
 <video src='https://github.com/pabloozamora/UVG_Graficas_Proyecto_1/assets/77593400/ac0299c1-1063-4a9d-abb8-0418650cee6e' width=180/></video>
-<br>
 Debido a que las óribtas no podían distinguirse del todo con el skybox, aquí hay un pequeño demo de cómo se ven sin este:
 <br><br>
 <video src='https://github.com/pabloozamora/UVG_Graficas_Proyecto_1/assets/77593400/0e6853d4-6fec-4162-823b-174aa19a4e4b' width=180/></video>
